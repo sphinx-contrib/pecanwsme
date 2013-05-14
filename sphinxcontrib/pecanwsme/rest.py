@@ -88,7 +88,7 @@ class RESTControllerDirective(rst.Directive):
     }
     has_content = True
 
-    def make_rst_for_method(self, path, method):
+    def make_rst_for_method(self, path, method, http_method):
         docstring = prepare_docstring((method.__doc__ or '').rstrip('\n'))
         blank_line = docstring[-1]
         docstring = docstring[:-1]  # remove blank line appended automatically
@@ -109,9 +109,8 @@ class RESTControllerDirective(rst.Directive):
         # restore the blank line added as a spacer
         docstring.append(blank_line)
 
-        directive = http_directive('get', path, docstring)
-        for line in directive:
-            yield line
+        directive = http_directive(http_method, path, docstring)
+        return (line for line in directive)
 
     def make_rst_for_controller(self, path_prefix, controller):
         env = self.state.document.settings.env
@@ -140,7 +139,8 @@ class RESTControllerDirective(rst.Directive):
         if hasattr(controller, 'get_all') and controller.get_all.exposed:
             app.info('  Method: get_all')
             for line in self.make_rst_for_method(controller_path,
-                                                 controller.get_all):
+                                                 controller.get_all,
+                                                 'get'):
                 yield line
 
         if hasattr(controller, 'get_one') and controller.get_one.exposed:
@@ -150,7 +150,16 @@ class RESTControllerDirective(rst.Directive):
             path = controller_path + '(' + first_arg_name + ')/'
             for line in self.make_rst_for_method(
                     path,
-                    controller.get_one):
+                    controller.get_one,
+                    'get'):
+                yield line
+
+        if hasattr(controller, 'post') and controller.post.exposed:
+            app.info('  Method: %s' % controller.post)
+            for line in self.make_rst_for_method(
+                    controller_path,
+                    controller.post,
+                    'post'):
                 yield line
 
         # Look for exposed custom methods
@@ -158,7 +167,7 @@ class RESTControllerDirective(rst.Directive):
             app.info('  Method: %s' % name)
             method = getattr(controller, name)
             path = controller_path + name + '/'
-            for line in self.make_rst_for_method(path, method):
+            for line in self.make_rst_for_method(path, method, 'get'):  # FIXME
                 yield line
 
     def run(self):
