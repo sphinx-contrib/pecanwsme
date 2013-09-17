@@ -110,7 +110,7 @@ class RESTControllerDirective(rst.Directive):
         docstring.append(blank_line)
 
         directive = http_directive(http_method, path, docstring)
-        return (line for line in directive)
+        return directive
 
     def make_rst_for_controller(self, path_prefix, controller):
         env = self.state.document.settings.env
@@ -136,57 +136,70 @@ class RESTControllerDirective(rst.Directive):
                 first_arg_name = argspec[0][1]
                 controller_path += '(' + first_arg_name + ')/'
 
-        if hasattr(controller, 'get_all') and controller.get_all.exposed:
-            app.info('  Method: get_all')
-            for line in self.make_rst_for_method(controller_path,
-                                                 controller.get_all,
-                                                 'get'):
-                yield line
+        lines = []
 
-        if hasattr(controller, 'get') and controller.get.exposed:
-            app.info('  Method: get')
-            for line in self.make_rst_for_method(controller_path,
-                                                 controller.get,
-                                                 'get'):
-                yield line
+        for method_name, http_method_name in [('get_all', 'get'),
+                                              ('get', 'get'),
+                                          ]:
+            app.info('Checking %s for %s method' % (controller, method_name))
+            method = getattr(controller, method_name, None)
+            if method and method.exposed:
+                app.info('Found method: %s' % method_name)
+                lines.extend(
+                    self.make_rst_for_method(
+                        controller_path,
+                        method,
+                        http_method_name,
+                    )
+                )
 
+        # Handle the special case for get_one(). The path should
+        # include the name of the argument used to find the object.
         if hasattr(controller, 'get_one') and controller.get_one.exposed:
-            app.info('  Method: %s' % controller.get_one)
+            app.info('Found method: get_one')
             funcdef = controller.get_one._wsme_definition
             first_arg_name = funcdef.arguments[0].name
             path = controller_path + '(' + first_arg_name + ')/'
-            for line in self.make_rst_for_method(
+            lines.extend(
+                self.make_rst_for_method(
                     path,
                     controller.get_one,
-                    'get'):
-                yield line
+                    'get',
+                )
+            )
 
-        if hasattr(controller, 'post') and controller.post.exposed:
-            app.info('  Method: %s' % controller.post)
-            for line in self.make_rst_for_method(
-                    controller_path,
-                    controller.post,
-                    'post'):
-                yield line
-
-        if hasattr(controller, 'put') and controller.put.exposed:
-            app.info('  Method: %s' % controller.put)
-            for line in self.make_rst_for_method(
-                    controller_path,
-                    controller.put,
-                    'put'):
-                yield line
+        for method_name, http_method_name in [('post', 'post'),
+                                              ('put', 'put'),
+                                          ]:
+            app.info('Checking %s for %s method' % (controller, method_name))
+            method = getattr(controller, method_name, None)
+            if method and method.exposed:
+                app.info('Found method: %s' % method_name)
+                lines.extend(
+                    self.make_rst_for_method(
+                        controller_path,
+                        method,
+                        http_method_name,
+                    )
+                )
 
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
-            app.info('  Method: %s' % name)
+            app.info('Adding custom method: %s' % name)
             method = getattr(controller, name)
             path = controller_path + name + '/'
             actions = controller._custom_actions[name]
             for action in actions:
-                for line in self.make_rst_for_method(path, method,
-                                                     action.lower()):
-                    yield line
+                app.info('Custom method %s uses action %s' % (method, action))
+                lines.extend(
+                    self.make_rst_for_method(
+                        path,
+                        method,
+                        action.lower(),
+                    )
+                )
+
+        return lines
 
     def run(self):
         env = self.state.document.settings.env
