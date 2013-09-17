@@ -143,6 +143,13 @@ class RESTControllerDirective(rst.Directive):
                                                  'get'):
                 yield line
 
+        if hasattr(controller, 'get') and controller.get.exposed:
+            app.info('  Method: get')
+            for line in self.make_rst_for_method(controller_path,
+                                                 controller.get,
+                                                 'get'):
+                yield line
+
         if hasattr(controller, 'get_one') and controller.get_one.exposed:
             app.info('  Method: %s' % controller.get_one)
             funcdef = controller.get_one._wsme_definition
@@ -162,13 +169,24 @@ class RESTControllerDirective(rst.Directive):
                     'post'):
                 yield line
 
+        if hasattr(controller, 'put') and controller.put.exposed:
+            app.info('  Method: %s' % controller.put)
+            for line in self.make_rst_for_method(
+                    controller_path,
+                    controller.put,
+                    'put'):
+                yield line
+
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
             app.info('  Method: %s' % name)
             method = getattr(controller, name)
             path = controller_path + name + '/'
-            for line in self.make_rst_for_method(path, method, 'get'):  # FIXME
-                yield line
+            actions = controller._custom_actions[name]
+            for action in actions:
+                for line in self.make_rst_for_method(path, method,
+                                                     action.lower()):
+                    yield line
 
     def run(self):
         env = self.state.document.settings.env
