@@ -186,10 +186,16 @@ class RESTControllerDirective(rst.Directive):
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
             app.info('Adding custom method: %s' % name)
-            method = getattr(controller, name)
             path = controller_path + name + '/'
             actions = controller._custom_actions[name]
             for action in actions:
+                # Check for a method prefixed with the HTTP verb
+                # otherwise use the method with only the action name
+                method_name = "%s_%s" % (action.lower(), name)
+                if hasattr(controller, method_name):
+                    method = getattr(controller, method_name)
+                else:
+                    method = getattr(controller, name)
                 app.info('Custom method %s uses action %s' % (method, action))
                 lines.extend(
                     self.make_rst_for_method(
