@@ -1,5 +1,5 @@
 =============================
- sphinxcontrib-pecanwsme 0.5
+ sphinxcontrib-pecanwsme 0.6
 =============================
 
 .. tags:: sphinxcontrib-pecanwsme pecan WSME sphinx release
@@ -14,6 +14,5 @@ built with the Pecan_ web framework and WSME_.
 What's New?
 ===========
 
-- Add support for extracting documentation from custom controller
-  methods with name that include the HTTP verb. (contributed by Mehdi
-  Abaakouk)
+- Add support for DELETE and PATCH HTTP verbs (contributed by Imre
+  Farkas and Haomeng Wang)
