@@ -170,6 +170,8 @@ class RESTControllerDirective(rst.Directive):
 
         for method_name, http_method_name in [('post', 'post'),
                                               ('put', 'put'),
+                                              ('delete', 'delete'),
+                                              ('patch', 'patch'),
                                           ]:
             app.info('Checking %s for %s method' % (controller, method_name))
             method = getattr(controller, method_name, None)
