@@ -116,7 +116,7 @@ class RESTControllerDirective(rst.Directive):
         env = self.state.document.settings.env
         app = env.app
 
-        controller_path = path_prefix.rstrip('/') + '/'
+        controller_path = path_prefix.rstrip('/')
 
         # Some of the controllers are instantiated dynamically, so
         # we need to look at their constructor arguments to see
@@ -134,7 +134,7 @@ class RESTControllerDirective(rst.Directive):
         else:
             if len(argspec[0]) > 1:
                 first_arg_name = argspec[0][1]
-                controller_path += '(' + first_arg_name + ')/'
+                controller_path += '/(' + first_arg_name + ')'
 
         lines = []
 
@@ -159,7 +159,7 @@ class RESTControllerDirective(rst.Directive):
             app.info('Found method: get_one')
             funcdef = controller.get_one._wsme_definition
             first_arg_name = funcdef.arguments[0].name
-            path = controller_path + '(' + first_arg_name + ')/'
+            path = controller_path + '/(' + first_arg_name + ')'
             lines.extend(
                 self.make_rst_for_method(
                     path,
@@ -188,7 +188,7 @@ class RESTControllerDirective(rst.Directive):
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
             app.info('Adding custom method: %s' % name)
-            path = controller_path + name + '/'
+            path = controller_path + '/' + name
             actions = controller._custom_actions[name]
             for action in actions:
                 # Check for a method prefixed with the HTTP verb
