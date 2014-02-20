@@ -1,5 +1,5 @@
 =============================
- sphinxcontrib-pecanwsme 0.6
+ sphinxcontrib-pecanwsme 0.7
 =============================
 
 .. tags:: sphinxcontrib-pecanwsme pecan WSME sphinx release
@@ -14,5 +14,5 @@ built with the Pecan_ web framework and WSME_.
 What's New?
 ===========
 
-- Add support for DELETE and PATCH HTTP verbs (contributed by Imre
-  Farkas and Haomeng Wang)
+- Remove the trailing slash from the end of the URLs, as it results in
+  misleading feature documentation, see Ceilometer bug #1202744.
