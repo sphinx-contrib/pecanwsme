@@ -2,7 +2,7 @@
  sphinxcontrib-pecanwsme 0.7
 =============================
 
-.. tags:: sphinxcontrib-pecanwsme pecan WSME sphinx release
+.. tags:: sphinxcontrib-pecanwsme, pecan, WSME, sphinx, release
 
 `sphinxcontrib-pecanwsme`_ is an extension to Sphinx for documenting APIs
 built with the Pecan_ web framework and WSME_.
