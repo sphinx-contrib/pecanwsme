@@ -1,6 +1,6 @@
-=============================
- sphinxcontrib-pecanwsme 0.7
-=============================
+===============================
+ sphinxcontrib-pecanwsme 0.7.1
+===============================
 
 .. tags:: sphinxcontrib-pecanwsme, pecan, WSME, sphinx, release
 
@@ -14,5 +14,4 @@ built with the Pecan_ web framework and WSME_.
 What's New?
 ===========
 
-- Remove the trailing slash from the end of the URLs, as it results in
-  misleading feature documentation, see Ceilometer bug #1202744.
+* Fix formatting issue for docstrings without param list
