@@ -101,6 +101,10 @@ class RESTControllerDirective(rst.Directive):
             docstring.append(':type %s: %s' %
                              (arg.name, datatypename(arg.datatype)))
 
+        # Add a blank line before return type to avoid the formatting issues
+        # that are caused because of missing blank lines between blocks
+        docstring.append(blank_line)
+
         # Add the return type
         if funcdef.return_type:
             return_type = datatypename(funcdef.return_type)
