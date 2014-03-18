@@ -20,10 +20,13 @@ from Pecan controllers exposed through WSME.
 
 """
 import inspect
+from functools import reduce
 
 from docutils import nodes
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
+
+import six
 
 from sphinx.util.nodes import nested_parse_with_titles
 from sphinx.util.docstrings import prepare_docstring
@@ -53,7 +56,7 @@ def http_directive(method, path, content):
     :param content: Text describing the endpoint.
     """
     method = method.lower().strip()
-    if isinstance(content, basestring):
+    if isinstance(content, six.string_types):
         content = content.splitlines()
     yield ''
     yield '.. http:{method}:: {path}'.format(**locals())
