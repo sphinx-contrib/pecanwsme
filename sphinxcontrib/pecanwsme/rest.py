@@ -93,25 +93,27 @@ class RESTControllerDirective(rst.Directive):
         blank_line = docstring[-1]
         docstring = docstring[:-1]  # remove blank line appended automatically
 
-        funcdef = method._wsme_definition
 
-        # Add the parameter type information. Assumes that the
-        # developer has provided descriptions of the parameters.
-        for arg in funcdef.arguments:
-            docstring.append(':type %s: %s' %
-                             (arg.name, datatypename(arg.datatype)))
+        if hasattr(method, '_wsme_definition'):
+            funcdef = method._wsme_definition
 
-        # Add a blank line before return type to avoid the formatting issues
-        # that are caused because of missing blank lines between blocks
-        docstring.append(blank_line)
+            # Add the parameter type information. Assumes that the
+            # developer has provided descriptions of the parameters.
+            for arg in funcdef.arguments:
+                docstring.append(':type %s: %s' %
+                                 (arg.name, datatypename(arg.datatype)))
 
-        # Add the return type
-        if funcdef.return_type:
-            return_type = datatypename(funcdef.return_type)
-            docstring.append(':return type: %s' % return_type)
+            # Add a blank line before return type to avoid the formatting issues
+            # that are caused because of missing blank lines between blocks
+            docstring.append(blank_line)
 
-        # restore the blank line added as a spacer
-        docstring.append(blank_line)
+            # Add the return type
+            if funcdef.return_type:
+                return_type = datatypename(funcdef.return_type)
+                docstring.append(':return type: %s' % return_type)
+
+            # restore the blank line added as a spacer
+            docstring.append(blank_line)
 
         directive = http_directive(http_method, path, docstring)
         return directive
