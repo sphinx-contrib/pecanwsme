@@ -163,16 +163,22 @@ class RESTControllerDirective(rst.Directive):
         # include the name of the argument used to find the object.
         if hasattr(controller, 'get_one') and controller.get_one.exposed:
             app.info('Found method: get_one')
-            funcdef = controller.get_one._wsme_definition
-            first_arg_name = funcdef.arguments[0].name
-            path = controller_path + '/(' + first_arg_name + ')'
-            lines.extend(
-                self.make_rst_for_method(
-                    path,
-                    controller.get_one,
-                    'get',
+            funcdef = getattr(controller.get_one, '_wsme_definition', None)
+            if funcdef:
+                path = None
+                for arg in funcdef.arguments:
+                    sub_path = '/(' + arg.name + ')'
+                    if sub_path in controller_path:
+                        continue
+                    path = controller_path + sub_path
+                    break
+                lines.extend(
+                    self.make_rst_for_method(
+                        path,
+                        controller.get_one,
+                        'get',
+                    )
                 )
-            )
 
         for method_name, http_method_name in [('post', 'post'),
                                               ('put', 'put'),
