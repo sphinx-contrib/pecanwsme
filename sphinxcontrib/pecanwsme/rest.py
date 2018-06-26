@@ -22,14 +22,12 @@ from Pecan controllers exposed through WSME.
 import inspect
 from functools import reduce
 
+import six
 from docutils import nodes
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
-
-import six
-
-from sphinx.util.nodes import nested_parse_with_titles
 from sphinx.util.docstrings import prepare_docstring
+from sphinx.util.nodes import nested_parse_with_titles
 
 import wsme.types
 
@@ -96,18 +94,18 @@ class RESTControllerDirective(rst.Directive):
         blank_line = docstring[-1]
         docstring = docstring[:-1]  # remove blank line appended automatically
 
-
         if hasattr(method, '_wsme_definition'):
             funcdef = method._wsme_definition
 
             # Add the parameter type information. Assumes that the
             # developer has provided descriptions of the parameters.
             for arg in funcdef.arguments:
-                docstring.append(':type %s: %s' %
-                                 (arg.name, datatypename(arg.datatype)))
+                docstring.append(
+                    ':type %s: %s' % (arg.name, datatypename(arg.datatype)))
 
-            # Add a blank line before return type to avoid the formatting issues
-            # that are caused because of missing blank lines between blocks
+            # Add a blank line before return type to avoid the formatting
+            # issues that are caused because of missing blank lines between
+            # blocks
             docstring.append(blank_line)
 
             # Add the return type
@@ -147,9 +145,10 @@ class RESTControllerDirective(rst.Directive):
 
         lines = []
 
-        for method_name, http_method_name in [('get_all', 'get'),
-                                              ('get', 'get'),
-                                          ]:
+        for method_name, http_method_name in [
+            ('get_all', 'get'),
+            ('get', 'get'),
+        ]:
             app.info('Checking %s for %s method' % (controller, method_name))
             method = getattr(controller, method_name, None)
             if method and method.exposed:
@@ -159,8 +158,7 @@ class RESTControllerDirective(rst.Directive):
                         controller_path,
                         method,
                         http_method_name,
-                    )
-                )
+                    ))
 
         # Handle the special case for get_one(). The path should
         # include the name of the argument used to find the object.
@@ -174,14 +172,14 @@ class RESTControllerDirective(rst.Directive):
                     path,
                     controller.get_one,
                     'get',
-                )
-            )
+                ))
 
-        for method_name, http_method_name in [('post', 'post'),
-                                              ('put', 'put'),
-                                              ('delete', 'delete'),
-                                              ('patch', 'patch'),
-                                          ]:
+        for method_name, http_method_name in [
+            ('post', 'post'),
+            ('put', 'put'),
+            ('delete', 'delete'),
+            ('patch', 'patch'),
+        ]:
             app.info('Checking %s for %s method' % (controller, method_name))
             method = getattr(controller, method_name, None)
             if method and method.exposed:
@@ -191,8 +189,7 @@ class RESTControllerDirective(rst.Directive):
                         controller_path,
                         method,
                         http_method_name,
-                    )
-                )
+                    ))
 
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
@@ -213,8 +210,7 @@ class RESTControllerDirective(rst.Directive):
                         path,
                         method,
                         action.lower(),
-                    )
-                )
+                    ))
 
         return lines
 
@@ -228,8 +224,7 @@ class RESTControllerDirective(rst.Directive):
         controller = import_object(self.arguments[0])
 
         for line in self.make_rst_for_controller(
-                self.options.get('webprefix', '/'),
-                controller):
+                self.options.get('webprefix', '/'), controller):
             app.info('ADDING: %r' % line)
             result.append(line, '<' + __name__ + '>')
 
