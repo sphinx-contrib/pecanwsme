@@ -1,5 +1,5 @@
 ===============================
- sphinxcontrib-pecanwsme 0.7.1
+ sphinxcontrib-pecanwsme 0.9.0
 ===============================
 
 .. tags:: sphinxcontrib-pecanwsme, pecan, WSME, sphinx, release
@@ -14,4 +14,4 @@ built with the Pecan_ web framework and WSME_.
 What's New?
 ===========
 
-* Fix formatting issue for docstrings without param list
+* Add support for Python 3
