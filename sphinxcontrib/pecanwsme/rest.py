@@ -149,10 +149,10 @@ class RESTControllerDirective(rst.Directive):
             ('get_all', 'get'),
             ('get', 'get'),
         ]:
-            LOG.info('Checking %s for %s method', (controller, method_name))
+            LOG.debug('Checking %s for %s method', controller, method_name)
             method = getattr(controller, method_name, None)
             if method and method.exposed:
-                LOG.info('Found method: %s', method_name)
+                LOG.debug('Found method: %s', method_name)
                 lines.extend(
                     self.make_rst_for_method(
                         controller_path,
@@ -163,7 +163,7 @@ class RESTControllerDirective(rst.Directive):
         # Handle the special case for get_one(). The path should
         # include the name of the argument used to find the object.
         if hasattr(controller, 'get_one') and controller.get_one.exposed:
-            LOG.info('Found method: get_one')
+            LOG.debug('Found method: get_one')
             funcdef = controller.get_one._wsme_definition
             first_arg_name = funcdef.arguments[0].name
             path = controller_path + '/(' + first_arg_name + ')'
@@ -180,10 +180,10 @@ class RESTControllerDirective(rst.Directive):
             ('delete', 'delete'),
             ('patch', 'patch'),
         ]:
-            LOG.info('Checking %s for %s method', controller, method_name)
+            LOG.debug('Checking %s for %s method', controller, method_name)
             method = getattr(controller, method_name, None)
             if method and method.exposed:
-                LOG.info('Found method: %s', method_name)
+                LOG.debug('Found method: %s', method_name)
                 lines.extend(
                     self.make_rst_for_method(
                         controller_path,
@@ -193,7 +193,7 @@ class RESTControllerDirective(rst.Directive):
 
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
-            LOG.info('Adding custom method: %s', name)
+            LOG.debug('Adding custom method: %s', name)
             path = controller_path + '/' + name
             actions = controller._custom_actions[name]
             for action in actions:
@@ -204,7 +204,7 @@ class RESTControllerDirective(rst.Directive):
                     method = getattr(controller, method_name)
                 else:
                     method = getattr(controller, name)
-                LOG.info('Custom method %s uses action %s', method, action)
+                LOG.debug('Custom method %s uses action %s', method, action)
                 lines.extend(
                     self.make_rst_for_method(
                         path,
@@ -216,14 +216,13 @@ class RESTControllerDirective(rst.Directive):
 
     def run(self):
         controller_id = self.arguments[0]
-        LOG.info('found root-controller %s', controller_id)
+        LOG.debug('found root-controller %s', controller_id)
 
         result = ViewList()
         controller = import_object(self.arguments[0])
 
         for line in self.make_rst_for_controller(
                 self.options.get('webprefix', '/'), controller):
-            LOG.info('ADDING: %r', line)
             result.append(line, '<' + __name__ + '>')
 
         node = nodes.section()
@@ -235,5 +234,4 @@ class RESTControllerDirective(rst.Directive):
 
 
 def setup(app):
-    LOG.info('Initializing %s' % __name__)
     app.add_directive('rest-controller', RESTControllerDirective)
