@@ -17,8 +17,8 @@
 # under the License.
 """Sphinx extension for automatically generating API documentation
 from Pecan controllers exposed through WSME.
-
 """
+
 import inspect
 from functools import reduce
 
@@ -26,10 +26,13 @@ import six
 from docutils import nodes
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
+from sphinx.util import logging
 from sphinx.util.docstrings import prepare_docstring
 from sphinx.util.nodes import nested_parse_with_titles
 
 import wsme.types
+
+LOG = logging.getLogger(__name__)
 
 
 def import_object(import_name):
@@ -120,9 +123,6 @@ class RESTControllerDirective(rst.Directive):
         return directive
 
     def make_rst_for_controller(self, path_prefix, controller):
-        env = self.state.document.settings.env
-        app = env.app
-
         controller_path = path_prefix.rstrip('/')
 
         # Some of the controllers are instantiated dynamically, so
@@ -149,10 +149,10 @@ class RESTControllerDirective(rst.Directive):
             ('get_all', 'get'),
             ('get', 'get'),
         ]:
-            app.info('Checking %s for %s method' % (controller, method_name))
+            LOG.info('Checking %s for %s method', (controller, method_name))
             method = getattr(controller, method_name, None)
             if method and method.exposed:
-                app.info('Found method: %s' % method_name)
+                LOG.info('Found method: %s', method_name)
                 lines.extend(
                     self.make_rst_for_method(
                         controller_path,
@@ -163,7 +163,7 @@ class RESTControllerDirective(rst.Directive):
         # Handle the special case for get_one(). The path should
         # include the name of the argument used to find the object.
         if hasattr(controller, 'get_one') and controller.get_one.exposed:
-            app.info('Found method: get_one')
+            LOG.info('Found method: get_one')
             funcdef = controller.get_one._wsme_definition
             first_arg_name = funcdef.arguments[0].name
             path = controller_path + '/(' + first_arg_name + ')'
@@ -180,10 +180,10 @@ class RESTControllerDirective(rst.Directive):
             ('delete', 'delete'),
             ('patch', 'patch'),
         ]:
-            app.info('Checking %s for %s method' % (controller, method_name))
+            LOG.info('Checking %s for %s method', controller, method_name)
             method = getattr(controller, method_name, None)
             if method and method.exposed:
-                app.info('Found method: %s' % method_name)
+                LOG.info('Found method: %s', method_name)
                 lines.extend(
                     self.make_rst_for_method(
                         controller_path,
@@ -193,7 +193,7 @@ class RESTControllerDirective(rst.Directive):
 
         # Look for exposed custom methods
         for name in sorted(controller._custom_actions.keys()):
-            app.info('Adding custom method: %s' % name)
+            LOG.info('Adding custom method: %s', name)
             path = controller_path + '/' + name
             actions = controller._custom_actions[name]
             for action in actions:
@@ -204,7 +204,7 @@ class RESTControllerDirective(rst.Directive):
                     method = getattr(controller, method_name)
                 else:
                     method = getattr(controller, name)
-                app.info('Custom method %s uses action %s' % (method, action))
+                LOG.info('Custom method %s uses action %s', method, action)
                 lines.extend(
                     self.make_rst_for_method(
                         path,
@@ -215,17 +215,15 @@ class RESTControllerDirective(rst.Directive):
         return lines
 
     def run(self):
-        env = self.state.document.settings.env
-        app = env.app
         controller_id = self.arguments[0]
-        app.info('found root-controller %s' % controller_id)
+        LOG.info('found root-controller %s', controller_id)
 
         result = ViewList()
         controller = import_object(self.arguments[0])
 
         for line in self.make_rst_for_controller(
                 self.options.get('webprefix', '/'), controller):
-            app.info('ADDING: %r' % line)
+            LOG.info('ADDING: %r', line)
             result.append(line, '<' + __name__ + '>')
 
         node = nodes.section()
@@ -237,5 +235,5 @@ class RESTControllerDirective(rst.Directive):
 
 
 def setup(app):
-    app.info('Initializing %s' % __name__)
+    LOG.info('Initializing %s' % __name__)
     app.add_directive('rest-controller', RESTControllerDirective)
