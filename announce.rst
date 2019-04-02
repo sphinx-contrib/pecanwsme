@@ -1,6 +1,6 @@
-===============================
- sphinxcontrib-pecanwsme 0.9.0
-===============================
+================================
+ sphinxcontrib-pecanwsme 0.10.0
+================================
 
 .. tags:: sphinxcontrib-pecanwsme, pecan, WSME, sphinx, release
 
@@ -14,4 +14,5 @@ built with the Pecan_ web framework and WSME_.
 What's New?
 ===========
 
-* Add support for Python 3
+* Add support for Sphinx 2.0
+* Logs are moved to debug level to reduce noisiness of output
