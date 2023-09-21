@@ -130,7 +130,7 @@ class RESTControllerDirective(rst.Directive):
         # what parameters are needed and include them in the
         # URL. For now, we only ever want one at a time.
         try:
-            argspec = inspect.getargspec(controller.__init__)
+            argspec = inspect.getfullargspec(controller.__init__)
         except TypeError:
             # The default __init__ for object is a "slot wrapper" not
             # a method, so we can't inspect it. It doesn't take any
