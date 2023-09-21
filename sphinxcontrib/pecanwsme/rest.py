@@ -22,7 +22,6 @@ from Pecan controllers exposed through WSME.
 import inspect
 from functools import reduce
 
-import six
 from docutils import nodes
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -57,7 +56,7 @@ def http_directive(method, path, content):
     :param content: Text describing the endpoint.
     """
     method = method.lower().strip()
-    if isinstance(content, six.string_types):
+    if isinstance(content, str):
         content = content.splitlines()
     yield ''
     yield '.. http:{method}:: {path}'.format(**locals())
