@@ -22,14 +22,13 @@ from Pecan controllers exposed through WSME.
 import inspect
 from functools import reduce
 
+import wsme.types
 from docutils import nodes
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
 from sphinx.util import logging
 from sphinx.util.docstrings import prepare_docstring
 from sphinx.util.nodes import nested_parse_with_titles
-
-import wsme.types
 
 LOG = logging.getLogger(__name__)
 
@@ -72,8 +71,8 @@ def datatypename(datatype):
     Derived from wsmeext.sphinxext.datatypename.
     """
     if isinstance(datatype, wsme.types.DictType):
-        return 'dict(%s: %s)' % (datatypename(datatype.key_type),
-                                 datatypename(datatype.value_type))
+        return 'dict(%s: %s)' % (datatypename(
+            datatype.key_type), datatypename(datatype.value_type))
     if isinstance(datatype, wsme.types.ArrayType):
         return 'list(%s)' % datatypename(datatype.item_type)
     if isinstance(datatype, wsme.types.UserType):
@@ -102,8 +101,8 @@ class RESTControllerDirective(rst.Directive):
             # Add the parameter type information. Assumes that the
             # developer has provided descriptions of the parameters.
             for arg in funcdef.arguments:
-                docstring.append(
-                    ':type %s: %s' % (arg.name, datatypename(arg.datatype)))
+                docstring.append(':type %s: %s' %
+                                 (arg.name, datatypename(arg.datatype)))
 
             # Add a blank line before return type to avoid the formatting
             # issues that are caused because of missing blank lines between
